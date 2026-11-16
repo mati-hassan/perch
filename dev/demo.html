@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Field & Fern</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 17px/1.6 Georgia, serif; color: #23262b; background: #f6f4ee; cursor: none; overflow: hidden; }
+    header { display: flex; align-items: center; gap: 28px; padding: 0 36px; height: 54px; background: #fff; border-bottom: 1px solid #e3e0d6; }
+    header b { font: 700 21px Georgia, serif; letter-spacing: -.01em; margin-right: auto; }
+    header a { font: 500 15px system-ui, sans-serif; color: #4a4f57; text-decoration: none; }
+    header button { font: 600 14px system-ui, sans-serif; padding: 9px 18px; border: 0; border-radius: 999px; background: #2f5d50; color: #fff; }
+    main { margin: 0 auto; padding: 46px 36px 0; display: grid; grid-template-columns: 1.2fr 1fr; gap: 36px; }
+    .kicker { font: 700 12px system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: #2f5d50; }
+    h1 { font-size: 36px; line-height: 1.12; margin: 14px 0 18px; letter-spacing: -.015em; }
+    .lede { color: #5a5e66; font-size: 16px; margin: 0 0 24px; }
+    .cta { display: flex; gap: 14px; }
+    .cta button { font: 600 15px system-ui, sans-serif; padding: 13px 26px; border-radius: 10px; border: 0; background: #2f5d50; color: #fff; }
+    .cta button.alt { background: #fff; color: #2f5d50; box-shadow: inset 0 0 0 1.5px #2f5d50; }
+    .art { height: 230px; border-radius: 16px; margin-top: 22px;
+      background: radial-gradient(circle at 70% 30%, #f7d38a 0 12%, transparent 13%), linear-gradient(180deg, #a9cbd6 0%, #d8e6d2 62%, #7fa37b 63%, #5f8a5d 100%); }
+    .cards { margin: 44px auto 0; padding: 0 36px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .card { background: #fff; border: 1px solid #e3e0d6; border-radius: 14px; padding: 22px; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+    .card h3 { margin: 0 0 6px; font-size: 20px; }
+    .card p { margin: 0; color: #646870; font-size: 15px; }
+    #cursor { position: fixed; left: 0; top: 0; width: 26px; height: 26px; pointer-events: none; z-index: 2147483647; transform: translate(-100px, -100px); filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+    #cursor .ring { position: absolute; left: -14px; top: -14px; width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(47,93,80,.8); opacity: 0; }
+    #cursor.down .ring { animation: ring .45s ease-out; }
+    @keyframes ring { from { opacity: 1; transform: scale(.3); } to { opacity: 0; transform: scale(1.4); } }
+  </style>
+</head>
+<body>
+  <header><b>Field &amp; Fern</b><a href="#">Journal</a><a href="#">Guides</a><a href="#">Shop</a><a href="#">About</a><button>Subscribe</button></header>
+  <main>
+    <div>
+      <div class="kicker">Weekend reading</div>
+      <h1>A slow guide to noticing the small things</h1>
+      <p class="lede">Notes on patience, morning light, and the visitors that show up when you finally sit still.</p>
+      <div class="cta"><button>Start reading</button><button class="alt">Browse guides</button></div>
+    </div>
+    <div class="art" role="img" aria-label="Illustration"></div>
+  </main>
+  <section class="cards">
+    <div class="card"><h3>Morning walks</h3><p>Where to go before the city wakes up.</p></div>
+    <div class="card"><h3>Window gardens</h3><p>Small planters that bring the wildlife in.</p></div>
+    <div class="card"><h3>Field sketching</h3><p>Pencils, patience and a pocket notebook.</p></div>
+  </section>
+  <div id="cursor"><div class="ring"></div><svg width="26" height="26" viewBox="0 0 26 26"><path d="M3 2 L3 21 L8.2 16.4 L11.6 24 L15 22.5 L11.7 15 L18.6 15 Z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+  <script type="module">
+    import { startPerch } from '../extension/core/index.js';
+    import { createDomHost, localStorageStore } from '../extension/core/hosts/dom-host.js';
+    localStorage.clear(); // a fresh notebook for every take
+    const cur = document.getElementById('cursor');
+    addEventListener('mousemove', (e) => { cur.style.transform = `translate(${e.clientX - 3}px, ${e.clientY - 2}px)`; }, true);
+    addEventListener('mousedown', () => { cur.classList.remove('down'); void cur.offsetWidth; cur.classList.add('down'); }, true);
+    const host = createDomHost({ storage: localStorageStore('perch.video'), context: () => 'fieldandfern.com', perchOptions: { scanEvery: 500 } });
+    window.perch = await startPerch({ host, options: { idleThreshold: 99999, timeOverride: 'day' } });
+    window.ready = true;
+  </script>
+</body>
+</html>

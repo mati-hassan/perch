@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perch playground</title>
+  <style>
+    body { margin: 0; font: 17px/1.6 Georgia, serif; color: #222; background: #fafaf7; }
+    main { max-width: 760px; margin: 0 auto; padding: 60px 24px 400px; }
+    h1 { font-size: 40px; line-height: 1.6; margin: 0 0 20px; }   /* tall line box: the box top is well above the text */
+    .padded { padding-top: 28px; }                               /* invisible container with text below its top */
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin: 30px 0; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    button { font: 15px system-ui; padding: 8px 16px; border-radius: 8px; border: 0; background: #2f6f94; color: #fff; }
+    .ghost { background: none; color: #2f6f94; padding: 14px 16px 2px; }  /* text button with padding above */
+    pre { background: #1e1f24; color: #ddd; padding: 16px; border-radius: 8px; }
+    canvas#vid { display: block; width: 100%; height: 300px; }
+    .bar { display: flex; gap: 12px; align-items: center; }
+    h2.rule { border-bottom: 1px solid #ccc; padding-bottom: 6px; }
+    .faint { background: #f8f8f5; padding: 12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Strict perches, scrolling and video</h1>
+    <div class="padded"><a href="#">A link inside a padded, invisible container</a></div>
+    <p>Plain paragraph text is not a perch, and neither is <a href="#">a link in the middle of a sentence</a>. Below is a card with a visible border, so its top edge counts.</p>
+    <h2 class="rule">A heading with a rule under it</h2>
+    <div class="faint">A box whose background is almost the page colour: not a perch.</div>
+    <div class="card"><h3 style="margin:0">A card with a border</h3><p style="margin:.5em 0 0">The card's top edge is a perch; so is the heading's text.</p></div>
+    <div class="bar"><button>Filled button</button><button class="ghost">Text button</button></div>
+    <h2>A playing video (birds keep off it)</h2>
+    <video id="video" muted playsinline loop width="712" height="300" style="width:100%;height:300px;background:#000"></video>
+    <h2>Code</h2>
+    <pre><code>function rubberDuck() {
+  return 'explain your bug to me';
+}</code></pre>
+    <h2>More to scroll</h2>
+    <p style="height: 900px">Scroll this page: perched birds ride along gently, and a hard scroll makes them lift off.</p>
+  </main>
+  <script type="module">
+    import { startPerch } from '../extension/core/index.js';
+    import { createDomHost, localStorageStore } from '../extension/core/hosts/dom-host.js';
+
+    // A "video" that plays without any media file: a canvas stream.
+    const c = document.createElement('canvas');
+    c.width = 320; c.height = 180;
+    const g = c.getContext('2d');
+    let t = 0;
+    setInterval(() => { t += 0.05; g.fillStyle = `hsl(${(t * 40) % 360} 60% 40%)`; g.fillRect(0, 0, 320, 180); }, 50);
+    const video = document.getElementById('video');
+    video.srcObject = c.captureStream(20);
+    video.play().catch(() => {});
+
+    const host = createDomHost({ storage: localStorageStore('perch.test.birdbook'), context: () => 'test page', perchOptions: { scanEvery: 600 } });
+    window.perch = await startPerch({ host, options: { idleThreshold: 4, debug: true } });
+  </script>
+</body>
+</html>
